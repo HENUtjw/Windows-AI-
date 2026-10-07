@@ -13,6 +13,14 @@ logs/
 # 浮窗预览产生的截图（可用 tools/preview_overlay.py --all 随时重新生成）
 _preview/
 
+# 发布包产物（用 tools/make_release.py 重新生成，不进版本库）
+dist/
+build/
+*.spec
+
+# 临时文件
+_commit_msg.txt
+
 # Python
 __pycache__/
 *.py[cod]
