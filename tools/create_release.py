@@ -12,6 +12,19 @@ import sys
 
 import requests
 
+# GitHub 域名在本机被 hosts 指向 127.0.0.1，由加速器（Steam++.Accelerator）做
+# TLS 中间人。它的根证书装在 **Windows 证书存储**里，而 requests 默认用 certifi
+# 的证书包 —— 于是报 "unable to get local issuer certificate"。
+# git 之所以能推送，是因为它用 schannel，读的就是 Windows 证书存储。
+# truststore 让 Python 也走同一套，两边行为就一致了。
+try:
+    import truststore
+
+    truststore.inject_into_ssl()
+    TLS_BACKEND = "Windows 证书存储（truststore）"
+except ImportError:
+    TLS_BACKEND = "certifi（若报证书错误：pip install truststore）"
+
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 OWNER_REPO = "HENUtjw/Windows-AI-"
@@ -82,6 +95,7 @@ def github_token() -> str:
 
 
 def main() -> int:
+    print(f"TLS 信任来源: {TLS_BACKEND}")
     token = github_token()
     headers = {
         "Authorization": f"Bearer {token}",
@@ -123,8 +137,12 @@ def main() -> int:
     upload_url = release["upload_url"].split("{")[0]
     with open(ARCHIVE, "rb") as handle:
         payload = handle.read()
+    # 用 os.path.basename 取文件名：Windows 路径是反斜杠，split("/") 会原样返回整条路径，
+    # 结果附件名被写成 C.Users.xxx.zip（踩过一次）
+    asset_name = os.path.basename(ARCHIVE)
     upload = requests.post(
-        f"{upload_url}?name={ARCHIVE.split('/')[-1]}",
+        upload_url,
+        params={"name": asset_name},
         headers={**headers, "Content-Type": "application/zip"},
         data=payload,
         timeout=300,
