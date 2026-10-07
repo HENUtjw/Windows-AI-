@@ -1,0 +1,8 @@
+# 程序运行所需。你的环境通常已经装好这些，可以直接运行。
+uiautomation>=2.0.15
+comtypes>=1.2.0
+requests>=2.28
+
+# 仅诊断工具需要（tools/preview_overlay.py 截图、tools/e2e_selftest.py --shot）。
+# 不装也不影响程序和其余功能。
+# pillow>=9.0
