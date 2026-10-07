@@ -6,15 +6,18 @@
 """
 
 import json
+import os
 import subprocess
 import sys
 
 import requests
 
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 OWNER_REPO = "HENUtjw/Windows-AI-"
 TAG = "v0.1.0"
 NAME = "v0.1.0 · 首个公开版本"
-ARCHIVE = "dist/ai-caption-translator-v0.1.0.zip"
+ARCHIVE = os.path.join(_ROOT, "dist", "ai-caption-translator-v0.1.0.zip")
 
 BODY = """\
 把 Windows 系统「实时字幕」的文本取出来，用 DeepSeek 翻译后显示在置顶浮窗上。
